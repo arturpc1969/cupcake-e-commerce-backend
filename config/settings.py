@@ -37,8 +37,15 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'accounts',
+    'ninja',
     'api',
 ]
+
+AUTH_USER_MODEL = "accounts.User"
+
+ACCESS_TOKEN_LIFETIME_MINUTES = 60   # 1 hour
+REFRESH_TOKEN_LIFETIME_DAYS = 7      # 7 days
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',

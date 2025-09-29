@@ -1,7 +1,10 @@
 from ninja import NinjaAPI
 
+from api import auth
+from . import protected
+
 api = NinjaAPI()
 
-@api.get("/hello")
-def hello(request, name: str = "mundo"):
-    return {"message": f"Olá, {name}!"}
+
+api.add_router("/auth/", auth.router)
+api.add_router("/protected/", protected.router)
