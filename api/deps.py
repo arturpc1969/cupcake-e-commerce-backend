@@ -1,5 +1,4 @@
 from django.contrib.auth import get_user_model
-from django.contrib.auth.models import User
 from ninja.security import HttpBearer
 
 from .auth import decode_token
@@ -12,7 +11,10 @@ class AuthBearer(HttpBearer):
         if not payload or payload.get("type") != "access":
             return None
         try:
-            return User.objects.get(id=payload["user_id"])
+            user = User.objects.get(id=payload["user_id"])
+            if not user.is_active:
+                return None
+            return user
         except User.DoesNotExist:
             return None
 

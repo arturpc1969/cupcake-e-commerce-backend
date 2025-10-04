@@ -3,7 +3,6 @@ from datetime import datetime, timedelta, UTC
 import jwt
 from django.conf import settings
 from django.contrib.auth import authenticate, get_user_model
-from django.contrib.auth.models import User
 from ninja import Router, Schema
 
 router = Router()
@@ -17,6 +16,8 @@ ALGORITHM = "HS256"
 # --- Schemas ---
 class SignupSchema(Schema):
     username: str
+    first_name: str
+    last_name: str
     password: str
     email: str
     cpf: str | None = None
@@ -77,11 +78,13 @@ def signup(request, data: SignupSchema):
         return {"error": "User already exists"}
     user = User.objects.create_user(
         username=data.username,
+        first_name=data.first_name,
+        last_name=data.last_name,
         email=data.email,
         password=data.password,
         cpf=data.cpf,
     )
-    return {"message": "User created successfully", "id": user.id}
+    return {"message": "User successfully created", "id": user.id}
 
 
 @router.post("/login", response={200: TokenPairResponse, 401: ErrorResponse})
