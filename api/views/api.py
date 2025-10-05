@@ -1,11 +1,11 @@
 from ninja import NinjaAPI
 
-from api import auth
-from . import protected, users
+from accounts.views import auth
+from . import users, products
 
 api = NinjaAPI()
 
 
 api.add_router("/auth/", auth.router)
-api.add_router("/protected/", protected.router)
 api.add_router("/users/", users.router)
+api.add_router("/products/", products.router)

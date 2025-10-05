@@ -9,7 +9,7 @@ class Product(BaseModel):
     name = models.CharField(max_length=100)
     description = models.TextField()
     price = models.DecimalField(decimal_places=2, max_digits=10)
-    image = models.ImageField()
+    image = models.ImageField(upload_to='products/', null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
