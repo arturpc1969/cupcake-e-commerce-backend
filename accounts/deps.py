@@ -1,7 +1,7 @@
 from django.contrib.auth import get_user_model
 from ninja.security import HttpBearer
 
-from .auth import decode_token
+from accounts.utils import decode_token
 
 User = get_user_model()
 
