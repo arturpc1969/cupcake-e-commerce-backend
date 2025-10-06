@@ -1,9 +1,11 @@
 import os
 from uuid import UUID, uuid4
 
+from django.core.exceptions import ValidationError
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from ninja import Router, File, UploadedFile, Form
+from ninja.errors import ValidationError as NinjaValidationError
 
 from accounts.deps import AuthBearer
 from api.models import Product
@@ -56,8 +58,12 @@ def update_product(
         image_path = save_uploaded_image(image)
         product.image = image_path
 
-    product.save()
-    return product
+    try:
+        product.full_clean()
+        product.save()
+        return product
+    except ValidationError as e:
+        raise NinjaValidationError(e.message_dict)
 
 
 # --- READ ONE (public) ---
@@ -79,13 +85,16 @@ def create_product(
 ):
     """Create a new product (only staff)"""
     image_path = save_uploaded_image(image) if image else None
-    product = Product.objects.create(
-        name=name,
-        description=description,
-        price=price,
-        image=image_path,
-    )
-    return product
+    product = Product(name=name,
+                      description=description,
+                      price=price,
+                      image=image_path)
+    try:
+        product.full_clean()
+        product.save()
+        return product
+    except ValidationError as e:
+        raise NinjaValidationError(e.message_dict)
 
 
 # --- DELETE (staff only) ---
@@ -106,5 +115,9 @@ def upload_product_image(request, product_uuid: UUID, image: UploadedFile = File
     product = get_object_or_404(Product, uuid=product_uuid)
     image_path = save_uploaded_image(image) if image else None
     product.image = image_path
-    product.save()
-    return product
+    try:
+        product.full_clean()
+        product.save()
+        return product
+    except ValidationError as e:
+        raise NinjaValidationError(e.message_dict)

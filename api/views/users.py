@@ -1,6 +1,8 @@
 from django.contrib.auth import get_user_model
 from django.contrib.auth.hashers import check_password
+from django.core.exceptions import ValidationError
 from ninja import Router
+from ninja.errors import ValidationError as NinjaValidationError
 
 from accounts.deps import AuthBearer  # your authentication via token
 from api.schemas.users import UserOut, UserUpdate, UserDeactivate, ChangePasswordIn
@@ -21,8 +23,12 @@ def update_me(request, data: UserUpdate):
     user = request.auth
     for field, value in data.dict(exclude_unset=True).items():
         setattr(user, field, value)
-    user.save()
-    return user
+    try:
+        user.full_clean()
+        user.save()
+        return user
+    except ValidationError as e:
+        raise NinjaValidationError(e.message_dict)
 
 
 @router.patch("/me")
