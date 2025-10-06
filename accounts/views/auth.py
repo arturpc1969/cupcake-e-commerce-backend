@@ -21,7 +21,7 @@ def signup(request, data: SignupSchema):
         password=data.password,
         cpf=data.cpf,
     )
-    return {"message": "User successfully created", "id": user.id}
+    return {"message": "User successfully created", "uuid": user.uuid}
 
 
 @router.post("/login", response={200: TokenPairResponse, 401: ErrorResponse})
