@@ -1,9 +1,10 @@
-from django.conf import settings
-from django.db import models
 import uuid
 
+from django.conf import settings
+from django.db import models
+
 from api.models import DeliveryAddress
-from api.models.common import BaseModel
+from api.models.common import BaseModel, ActiveManager
 
 
 class Order(BaseModel):
@@ -25,7 +26,7 @@ class Order(BaseModel):
         CANCELED = 'CANCELED', 'Pedido Cancelado'
 
     uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
-    order_number = models.PositiveBigIntegerField(unique=True, editable=False)
+    order_number = models.PositiveBigIntegerField(unique=True, editable=False, db_index=True, null=True, blank=True)
     order_date = models.DateField(auto_now_add=True)
     payment_method = models.CharField(max_length=25, choices=PaymentMethod.choices)
     status = models.CharField(max_length=25, choices=OrderStatus.choices, default=OrderStatus.RECEIVED)
@@ -37,11 +38,12 @@ class Order(BaseModel):
     updated_at = models.DateTimeField(auto_now=True)
 
     def save(self, *args, **kwargs):
-        if not self.order_number:
-            super().save(*args, **kwargs)
-            self.order_number = self.id
-            return super().save(update_fields=["order_number"])
-        return super().save(*args, **kwargs)
+        if self.order_number is None:
+            last = Order.objects.aggregate(models.Max("order_number"))["order_number__max"]
+            self.order_number = (last or 0) + 1
+        super().save(*args, **kwargs)
+
+    objects = ActiveManager()
 
     class Meta:
         ordering = ['-created_at']
