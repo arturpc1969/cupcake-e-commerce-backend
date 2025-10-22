@@ -9,7 +9,7 @@ from ninja.errors import ValidationError as NinjaValidationError
 
 from accounts.deps import AuthBearer
 from api.models import Product
-from api.schemas.product import ProductOut
+from api.schemas.products import ProductOut
 from api.utils import staff_required
 
 router = Router(tags=["products"])
