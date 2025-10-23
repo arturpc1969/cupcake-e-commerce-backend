@@ -29,3 +29,7 @@ class OrderAdminOut(Schema):
     status: str
     delivery_address: DeliveryAddressOut
     user: UserOut
+
+
+class OrderInUpdate(OrderIn):
+    status: str

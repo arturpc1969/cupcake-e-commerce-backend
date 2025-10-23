@@ -2,14 +2,16 @@ from uuid import UUID
 
 from django.core.exceptions import ValidationError
 from django.db import transaction
+from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from ninja import Router
 from ninja.errors import HttpError
+from ninja.errors import ValidationError as NinjaValidationError
 
 from accounts.deps import AuthBearer
 from api.models import Order, DeliveryAddress
-from api.schemas.orders import OrderOut, OrderAdminOut, OrderIn
-from ninja.errors import ValidationError as NinjaValidationError
+from api.schemas.orders import OrderOut, OrderAdminOut, OrderIn, OrderInUpdate
+from api.utils import staff_required
 
 router = Router(tags=["orders"], auth=AuthBearer())
 
@@ -17,7 +19,7 @@ router = Router(tags=["orders"], auth=AuthBearer())
 # --- READ ALL ---
 @router.get("/", response=list[OrderOut])
 def list_orders(request):
-    """List all delivery addresses"""
+    """List all orders"""
     user = request.auth
     if user.is_staff:
         return Order.objects.all()
@@ -72,3 +74,29 @@ def create_order(request, data: OrderIn):
             return order
         except ValidationError as e:
             raise NinjaValidationError(e.message_dict)
+
+
+# --- UPDATE (staff only) ---
+@staff_required
+@router.put("/{order_uuid}", response=OrderOut)
+def update_order_staff(request, order_uuid: str, data: OrderInUpdate):
+    """Update an order (only staff)"""
+    order = get_object_or_404(Order, uuid=order_uuid)
+    for field, value in data.dict(exclude_unset=True).items():
+        setattr(order, field, value)
+    try:
+        order.full_clean()
+        order.save()
+        return order
+    except ValidationError as e:
+        raise NinjaValidationError(e.message_dict)
+
+
+# --- DELETE (staff only) ---
+@staff_required
+@router.delete("/{order_uuid}")
+def delete_order_staff(request, order_uuid: str):
+    """Delete an order (only staff)"""
+    order = get_object_or_404(Order, uuid=order_uuid)
+    order.soft_delete()
+    return HttpResponse(status=204)
