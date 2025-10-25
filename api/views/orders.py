@@ -21,8 +21,6 @@ router = Router(tags=["orders"], auth=AuthBearer())
 def list_orders(request):
     """List all orders"""
     user = request.auth
-    if user.is_staff:
-        return Order.objects.all()
     return Order.objects.filter(user=user).all()
 
 
@@ -41,8 +39,6 @@ def list_orders_staff(request):
 def get_order(request, order_uuid: UUID):
     """Get an order by uuid"""
     user = request.auth
-    if user.is_staff:
-        return get_object_or_404(Order, uuid=order_uuid)
     return get_object_or_404(Order, user=user, uuid=order_uuid)
 
 
