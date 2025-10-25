@@ -17,7 +17,9 @@ class Order(BaseModel):
         CASH = 'CASH', 'Dinheiro'
 
     class OrderStatus(models.TextChoices):
-        RECEIVED = 'RECEIVED', 'Pedido Recebido'
+        DRAFT = 'DRAFT', 'Pedido iniciado, mas ainda não submetido'
+        PENDING = 'PENDING', 'Pedido submetido, porém ainda não confirmado'
+        CONFIRMED = 'CONFIRMED', 'Pedido confirmado'
         PREPARATION = 'PREPARATION', 'Pedido em Preparação'
         DELIVERY = 'DELIVERY', 'Pedido em Entrega'
         WAITING_PAYMENT = 'WAITING_PAYMENT', 'Aguardando Pagamento'
@@ -29,7 +31,7 @@ class Order(BaseModel):
     order_number = models.PositiveBigIntegerField(unique=True, editable=False, db_index=True, null=True, blank=True)
     order_date = models.DateField(auto_now_add=True)
     payment_method = models.CharField(max_length=25, choices=PaymentMethod.choices)
-    status = models.CharField(max_length=25, choices=OrderStatus.choices, default=OrderStatus.RECEIVED)
+    status = models.CharField(max_length=25, choices=OrderStatus.choices, default=OrderStatus.DRAFT)
 
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.DO_NOTHING, related_name="my_orders")
     delivery_address = models.ForeignKey(DeliveryAddress, on_delete=models.DO_NOTHING)
