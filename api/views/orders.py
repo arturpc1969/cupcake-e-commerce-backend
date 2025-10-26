@@ -5,7 +5,6 @@ from django.db import transaction
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from ninja import Router
-from ninja.errors import HttpError
 from ninja.errors import ValidationError as NinjaValidationError
 
 from accounts.deps import AuthBearer
@@ -26,11 +25,9 @@ def list_orders(request):
 
 # --- READ ALL (staff only)---
 @router.get("/admin", response=list[OrderAdminOut])
+@staff_required
 def list_orders_staff(request):
     """List all orders from all users to staff"""
-    user = request.auth
-    if not user.is_staff:
-        raise HttpError(403, "Not authorized")
     return Order.objects.all()
 
 
@@ -44,11 +41,9 @@ def get_order(request, order_uuid: UUID):
 
 # --- READ ONE (staff only)---
 @router.get("/admin/{order_uuid}", response=OrderAdminOut)
+@staff_required
 def get_order_staff(request, order_uuid: UUID):
     """Get an order by uuid to staff"""
-    user = request.auth
-    if not user.is_staff:
-        raise HttpError(403, "Not authorized")
     return get_object_or_404(Order, uuid=order_uuid)
 
 
@@ -73,8 +68,8 @@ def create_order(request, data: OrderIn):
 
 
 # --- UPDATE (staff only) ---
-@staff_required
 @router.put("/{order_uuid}", response=OrderOut)
+@staff_required
 def update_order_staff(request, order_uuid: str, data: OrderInUpdate):
     """Update an order (only staff)"""
     order = get_object_or_404(Order, uuid=order_uuid)
@@ -89,8 +84,8 @@ def update_order_staff(request, order_uuid: str, data: OrderInUpdate):
 
 
 # --- DELETE (staff only) ---
-@staff_required
 @router.delete("/{order_uuid}")
+@staff_required
 def delete_order_staff(request, order_uuid: str):
     """Delete an order (only staff)"""
     order = get_object_or_404(Order, uuid=order_uuid)
