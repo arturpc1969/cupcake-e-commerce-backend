@@ -1,0 +1,10 @@
+[run]
+include =
+    api/*
+omit =
+    */tests/*
+    **/migrations/*
+    */__init__.py
+    api/manage.py
+[report]
+fail_under = 70
