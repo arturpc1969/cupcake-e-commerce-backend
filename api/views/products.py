@@ -1,5 +1,4 @@
-import os
-from uuid import UUID, uuid4
+from uuid import UUID
 
 from django.core.exceptions import ValidationError
 from django.http import HttpResponse
@@ -10,23 +9,10 @@ from ninja.errors import ValidationError as NinjaValidationError
 from accounts.deps import AuthBearer
 from api.models import Product
 from api.schemas.products import ProductOut
+from api.services.products import save_uploaded_image
 from api.utils import staff_required
 
 router = Router(tags=["products"])
-
-
-# --- Auxiliar function to save image ---
-def save_uploaded_image(image: UploadedFile) -> str:
-    ext = image.name.split('.')[-1]
-    filename = f"{uuid4()}.{ext}"
-    path = os.path.join('media', 'products', filename)
-    os.makedirs(os.path.dirname(path), exist_ok=True)
-
-    with open(path, 'wb+') as destination:
-        for chunk in image.chunks():
-            destination.write(chunk)
-
-    return f"products/{filename}"
 
 
 # --- READ ALL (public) ---
@@ -37,8 +23,8 @@ def list_products(request):
 
 
 # --- UPDATE (staff only) ---
-@staff_required
 @router.put("/{uuid}", response=ProductOut, auth=AuthBearer())
+@staff_required
 def update_product(
     request,
     uuid: str,
@@ -74,8 +60,8 @@ def get_product(request, uuid: UUID):
 
 
 # --- CREATE (staff only) ---
-@staff_required
 @router.post("/", response=ProductOut, auth=AuthBearer())
+@staff_required
 def create_product(
     request,
     name: str = Form(...),
@@ -98,8 +84,8 @@ def create_product(
 
 
 # --- DELETE (staff only) ---
-@staff_required
 @router.delete("/{uuid}", auth=AuthBearer())
+@staff_required
 def delete_product(request, uuid: str):
     """Delete a product (only staff)"""
     product = get_object_or_404(Product, uuid=uuid)
@@ -108,8 +94,8 @@ def delete_product(request, uuid: str):
 
 
 # --- Image upload ---
-@staff_required
 @router.post("/{product_uuid}/upload-image", response=ProductOut, auth=AuthBearer())
+@staff_required
 def upload_product_image(request, product_uuid: UUID, image: UploadedFile = File(...)):
     """Make upload or replace the product image"""
     product = get_object_or_404(Product, uuid=product_uuid)
