@@ -2,6 +2,7 @@ from uuid import UUID
 
 from django.core.exceptions import ValidationError
 from django.db import transaction
+from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from ninja import Router
 from ninja.errors import ValidationError as NinjaValidationError, HttpError
@@ -10,6 +11,7 @@ from accounts.deps import AuthBearer
 from api.models import OrderItem, Order, Product
 from api.schemas.orderitems import OrderItemIn, OrderItemOut, OrderItemAdminOut
 from api.services.orderitems import build_order_item_response, build_order_item_response_staff
+from api.utils import staff_required
 
 router = Router(tags=["order-items"], auth=AuthBearer())
 
@@ -56,11 +58,9 @@ def list_order_items(request):
 
 # --- READ ALL (staff only)---
 @router.get("/admin", response=list[OrderItemAdminOut])
+@staff_required
 def list_order_items_staff(request):
     """List all order with items from all users to staff"""
-    user = request.auth
-    if not user.is_staff:
-        raise HttpError(403, "Not authorized")
     orders = Order.objects.all()
     order_items_out = [build_order_item_response_staff(order) for order in orders]
     return order_items_out
@@ -77,11 +77,9 @@ def get_order_item(request, order_uuid: UUID):
 
 # --- READ ONE (staff only)---
 @router.get("/admin/{order_uuid}", response=OrderItemAdminOut)
+@staff_required
 def get_order_item_staff(request, order_uuid: UUID):
     """Get an order with items by uuid to staff"""
-    user = request.auth
-    if not user.is_staff:
-        raise HttpError(403, "Not authorized")
     order = get_object_or_404(Order, uuid=order_uuid)
     return build_order_item_response_staff(order)
 
@@ -102,3 +100,29 @@ def update_order_item(request, data: OrderItemIn):
         return build_order_item_response(order)
     except ValidationError as e:
         raise NinjaValidationError(e.message_dict)
+
+
+# --- DELETE ---
+@router.delete("/{order_uuid}/{product_uuid}")
+def delete_order_item(request, order_uuid: str, product_uuid: str):
+    """Delete an order item"""
+    user = request.auth
+    order = get_object_or_404(Order, user=user, uuid=order_uuid)
+    if order.status not in (Order.OrderStatus.DRAFT, Order.OrderStatus.PENDING):
+        raise HttpError(400, f"Order cannot delete items at '{order.status}' status")
+    product = get_object_or_404(Product, uuid=product_uuid)
+    order_item = get_object_or_404(OrderItem, order=order, product=product)
+    order_item.delete()
+    return HttpResponse(status=204)
+
+
+# --- DELETE (staff only) ---
+@router.delete("/admin/{order_uuid}/{product_uuid}")
+@staff_required
+def delete_order_item(request, order_uuid: str, product_uuid: str):
+    """Delete an order item"""
+    order = get_object_or_404(Order, uuid=order_uuid)
+    product = get_object_or_404(Product, uuid=product_uuid)
+    order_item = get_object_or_404(OrderItem, order=order, product=product)
+    order_item.delete()
+    return HttpResponse(status=204)
