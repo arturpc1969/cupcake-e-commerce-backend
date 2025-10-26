@@ -5,6 +5,7 @@ from ninja import Schema
 
 from api.schemas.deliveryaddresses import DeliveryAddressOut
 from api.schemas.products import ProductOut
+from api.schemas.users import UserOut
 
 
 class OrderItemIn(Schema):
@@ -25,3 +26,7 @@ class OrderItemOut(Schema):
     status: str
     delivery_address: DeliveryAddressOut
     products: list[ItemOut]
+
+
+class OrderItemAdminOut(OrderItemOut):
+    user: UserOut

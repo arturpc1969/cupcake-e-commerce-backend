@@ -21,13 +21,7 @@ class OrderOut(Schema):
     delivery_address: DeliveryAddressOut
 
 
-class OrderAdminOut(Schema):
-    uuid: UUID
-    order_number: int
-    order_date: date
-    payment_method: str
-    status: str
-    delivery_address: DeliveryAddressOut
+class OrderAdminOut(OrderOut):
     user: UserOut
 
 
