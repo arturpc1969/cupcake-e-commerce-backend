@@ -7,4 +7,4 @@ omit =
     */__init__.py
     api/manage.py
 [report]
-fail_under = 70
+fail_under = 82

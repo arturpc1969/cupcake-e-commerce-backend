@@ -25,7 +25,7 @@ def list_delivery_addresses(request):
 
 
 # --- READ ONE ---
-@router.get("/{uuid}", response=list[DeliveryAddressOut])
+@router.get("/{uuid}", response=DeliveryAddressOut)
 def get_delivery_address(request, uuid: UUID):
     """Get a delivery address by UUID"""
     user = request.auth
