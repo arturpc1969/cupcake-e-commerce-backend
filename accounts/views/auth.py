@@ -1,5 +1,7 @@
 from django.contrib.auth import authenticate, get_user_model
+from django.core.exceptions import ValidationError
 from ninja import Router
+from ninja.errors import ValidationError as NinjaValidationError
 
 from accounts.schemas import SignupSchema, TokenPairResponse, LoginSchema, RefreshSchema, ErrorResponse
 from accounts.utils import create_access_token, create_refresh_token, decode_token
@@ -13,7 +15,7 @@ User = get_user_model()
 def signup(request, data: SignupSchema):
     if User.objects.filter(username=data.username).exists():
         return {"error": "User already exists"}
-    user = User.objects.create_user(
+    user = User(
         username=data.username,
         first_name=data.first_name,
         last_name=data.last_name,
@@ -21,7 +23,12 @@ def signup(request, data: SignupSchema):
         password=data.password,
         cpf=data.cpf,
     )
-    return {"message": "User successfully created", "uuid": user.uuid}
+    try:
+        user.full_clean()
+        user.save()
+        return {"message": "User successfully created", "uuid": user.uuid}
+    except ValidationError as e:
+        raise NinjaValidationError(e.message_dict)
 
 
 @router.post("/login", response={200: TokenPairResponse, 401: ErrorResponse})
