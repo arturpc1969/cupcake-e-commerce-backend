@@ -13,6 +13,7 @@ class UserOut(Schema):
     full_name: str | None = None
     cpf: str | None = None
     email: str | None = None
+    is_staff: bool
 
     @field_serializer("full_name")
     def get_full_name(self, value, info):
