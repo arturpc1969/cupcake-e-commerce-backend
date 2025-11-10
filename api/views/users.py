@@ -50,7 +50,7 @@ def delete_me(request):
     return 204, None
 
 
-@router.post("/change-password")
+@router.post("/me/change-password")
 def change_password(request, data: ChangePasswordIn):
     """
     Allow the user to change their password
