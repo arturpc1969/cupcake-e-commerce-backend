@@ -138,7 +138,8 @@ def test_create_product_success(client, staff_auth_headers):
     data = {
         "name": "Cupcake de Baunilha",
         "description": "Cupcake de baunilha com glacê",
-        "price": 13.50
+        "price": 13.50,
+        "promotion": False
     }
 
     response = client.post(
@@ -161,6 +162,7 @@ def test_create_product_with_image(client, staff_auth_headers, sample_image):
         "name": "Cupcake com Imagem",
         "description": "Cupcake com foto",
         "price": 16.00,
+        "promotion": False,
         "image": sample_image
     }
 
@@ -182,7 +184,8 @@ def test_create_product_forbidden_for_regular_user(client, auth_headers):
     data = {
         "name": "Cupcake Proibido",
         "description": "Este não deveria ser criado",
-        "price": 10.00
+        "price": 10.00,
+        "promotion": False
     }
 
     response = client.post(
@@ -247,6 +250,7 @@ def test_update_product_success(product, staff_auth_headers, tmp_path):
             "name": "Cupcake Atualizado",
             "description": "Descrição atualizada",
             "price": 18.00,
+            "promotion": False,
             "image": image_file,
         }
 
@@ -280,6 +284,7 @@ def test_update_product_with_image(product, staff_auth_headers, tmp_path):
             "name": "Cupcake com Nova Imagem",
             "description": "Descrição com imagem",
             "price": 20.00,
+            "promotion": False,
             "image": image_file
         }
 
@@ -313,6 +318,7 @@ def test_update_product_forbidden_for_regular_user(product, auth_headers, tmp_pa
             "name": "Tentativa de Atualização",
             "description": "Não deveria funcionar",
             "price": 15.00,
+            "promotion": False,
             "image": image_file
         }
 
@@ -345,6 +351,7 @@ def test_update_product_not_found(staff_auth_headers, tmp_path):
             "name": "Produto Inexistente",
             "description": "Não existe",
             "price": 10.00,
+            "promotion": False,
             "image": image_file,
         }
 

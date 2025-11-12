@@ -112,7 +112,8 @@ def product():
     return Product.objects.create(
         name="Produto Teste",
         description="Descrição do produto",
-        price=100.00
+        price=100.00,
+        promotion=False
     )
 
 
@@ -121,7 +122,8 @@ def another_product():
     return Product.objects.create(
         name="Outro Produto",
         description="Outra descrição",
-        price=50.00
+        price=50.00,
+        promotion=False
     )
 
 
