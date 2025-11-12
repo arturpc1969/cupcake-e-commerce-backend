@@ -31,6 +31,7 @@ def update_product(
     name: str = Form(...),
     description: str = Form(...),
     price: float = Form(...),
+    promotion: bool = Form(...),
     image: UploadedFile | None = File(None),
 ):
     """Update a product (only staff)"""
@@ -39,6 +40,7 @@ def update_product(
     product.name = name
     product.description = description
     product.price = price
+    product.promotion = promotion
 
     if image:
         image_path = save_uploaded_image(image)
@@ -67,6 +69,7 @@ def create_product(
     name: str = Form(...),
     description: str = Form(...),
     price: float = Form(...),
+    promotion: bool = Form(...),
     image: UploadedFile | None = File(None),
 ):
     """Create a new product (only staff)"""
@@ -74,6 +77,7 @@ def create_product(
     product = Product(name=name,
                       description=description,
                       price=price,
+                      promotion=promotion,
                       image=image_path)
     try:
         product.full_clean()

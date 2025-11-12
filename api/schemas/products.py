@@ -9,4 +9,5 @@ class ProductOut(Schema):
     name: str
     description: str
     price: float
+    promotion: bool
     image: Optional[str] = None

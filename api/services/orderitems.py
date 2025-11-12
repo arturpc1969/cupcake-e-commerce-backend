@@ -11,6 +11,7 @@ def build_order_item_response(order: Order) -> OrderItemOut:
             name=item.product.name,
             description=item.product.description,
             price=float(item.unit_price),
+            promotion=item.product.promotion,
             image=item.product.image.url if item.product.image else None,
             quantity=item.quantity
         )
@@ -37,6 +38,7 @@ def build_order_item_response_staff(order: Order) -> OrderItemAdminOut:
             name=item.product.name,
             description=item.product.description,
             price=float(item.unit_price),
+            promotion=item.product.promotion,
             image=item.product.image.url if item.product.image else None,
             quantity=item.quantity
         )
