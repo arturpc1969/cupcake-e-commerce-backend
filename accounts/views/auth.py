@@ -20,9 +20,9 @@ def signup(request, data: SignupSchema):
         first_name=data.first_name,
         last_name=data.last_name,
         email=data.email,
-        password=data.password,
         cpf=data.cpf,
     )
+    user.set_password(data.password)
     try:
         user.full_clean()
         user.save()

@@ -250,7 +250,7 @@ def test_change_password_success(client, user, auth_headers):
     }
 
     response = client.post(
-        "/api/users/change-password",
+        "/api/users/me/change-password",
         data=data,
         content_type="application/json",
         **auth_headers
@@ -275,7 +275,7 @@ def test_change_password_wrong_old_password(client, user, auth_headers):
     }
 
     response = client.post(
-        "/api/users/change-password",
+        "/api/users/me/change-password",
         data=data,
         content_type="application/json",
         **auth_headers
@@ -299,7 +299,7 @@ def test_change_password_missing_old_password(client, user, auth_headers):
     }
 
     response = client.post(
-        "/api/users/change-password",
+        "/api/users/me/change-password",
         data=data,
         content_type="application/json",
         **auth_headers
@@ -316,7 +316,7 @@ def test_change_password_missing_new_password(client, user, auth_headers):
     }
 
     response = client.post(
-        "/api/users/change-password",
+        "/api/users/me/change-password",
         data=data,
         content_type="application/json",
         **auth_headers
@@ -334,7 +334,7 @@ def test_change_password_without_auth(client):
     }
 
     response = client.post(
-        "/api/users/change-password",
+        "/api/users/me/change-password",
         data=data,
         content_type="application/json"
     )
@@ -351,7 +351,7 @@ def test_change_password_same_as_old(client, user, auth_headers):
     }
 
     response = client.post(
-        "/api/users/change-password",
+        "/api/users/me/change-password",
         data=data,
         content_type="application/json",
         **auth_headers
@@ -372,7 +372,7 @@ def test_change_password_weak_password(client, user, auth_headers):
     }
 
     response = client.post(
-        "/api/users/change-password",
+        "/api/users/me/change-password",
         data=data,
         content_type="application/json",
         **auth_headers
