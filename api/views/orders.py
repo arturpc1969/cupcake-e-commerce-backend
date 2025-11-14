@@ -83,6 +83,21 @@ def update_order_staff(request, order_uuid: str, data: OrderInUpdate):
         raise NinjaValidationError(e.message_dict)
 
 
+# --- UPDATE (user confirm) ---
+@router.put("/confirm/{order_uuid}", response=OrderOut)
+def update_order_user_confirm(request, order_uuid: str):
+    """Confirm an order (by user)"""
+    user = request.auth
+    order = get_object_or_404(Order, uuid=order_uuid, user=user)
+    order.status = Order.OrderStatus.CONFIRMED
+    try:
+        order.full_clean()
+        order.save()
+        return order
+    except ValidationError as e:
+        raise NinjaValidationError(e.message_dict)
+
+
 # --- DELETE (staff only) ---
 @router.delete("/{order_uuid}")
 @staff_required

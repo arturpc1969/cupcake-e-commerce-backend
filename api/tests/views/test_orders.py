@@ -319,6 +319,35 @@ def test_update_order_staff_not_found(client, staff_auth_headers):
     assert response.status_code == 404
 
 
+# --- TESTES PARA UPDATE ORDER (USER CONFIRM) ---
+
+@pytest.mark.django_db
+def test_update_order_user_confirm_success(client, order, auth_headers):
+    """Testa confirmação de pedido pelo usuário"""
+
+    response = client.put(
+        f"/api/orders/confirm/{order.uuid}",
+        **auth_headers
+    )
+
+    assert response.status_code == 200
+    order.refresh_from_db()
+    assert order.status == "CONFIRMED"
+
+
+@pytest.mark.django_db
+def test_update_order_user_confirm_not_found(client, auth_headers):
+    """Testa confirmação de pedido inexistente"""
+    fake_uuid = uuid4()
+
+    response = client.put(
+        f"/api/orders/confirm/{fake_uuid}",
+        **auth_headers
+    )
+
+    assert response.status_code == 404
+
+
 # --- TESTES PARA DELETE ORDER STAFF ---
 
 @pytest.mark.django_db
