@@ -1,3 +1,4 @@
+from decimal import Decimal
 from uuid import UUID
 
 from django.core.exceptions import ValidationError
@@ -30,7 +31,7 @@ def update_product(
     uuid: str,
     name: str = Form(...),
     description: str = Form(...),
-    price: float = Form(...),
+    price: Decimal = Form(...),
     promotion: bool = Form(...),
     image: UploadedFile | None = File(None),
 ):
@@ -68,7 +69,7 @@ def create_product(
     request,
     name: str = Form(...),
     description: str = Form(...),
-    price: float = Form(...),
+    price: Decimal = Form(...),
     promotion: bool = Form(...),
     image: UploadedFile | None = File(None),
 ):
