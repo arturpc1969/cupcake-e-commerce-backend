@@ -1,0 +1,25 @@
+services:
+  - type: web
+    name: cupcake-api
+    env: python
+    buildCommand: "./build.sh"
+    startCommand: "gunicorn config.wsgi:application"
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.0
+      - key: DEBUG
+        value: False
+      - key: SECRET_KEY
+        generateValue: true
+      - key: ALLOWED_HOSTS
+        value: .onrender.com
+      - key: CUPCAKE_DB_HOST
+        sync: false
+      - key: CUPCAKE_DB_NAME
+        value: cupcake
+      - key: CUPCAKE_DB_USER
+        sync: false
+      - key: CUPCAKE_DB_PASSWORD
+        sync: false
+      - key: CUPCAKE_DB_PORT
+        value: 5432

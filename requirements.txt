@@ -3,6 +3,7 @@ django-ninja~=1.4.3
 psycopg2-binary~=2.9.10
 PyJWT~=2.10.1
 django-cors-headers~=4.9.0
+gunicorn~=21.2.0
 
 pytest~=8.4.2
 pytest-django~=4.11.1
