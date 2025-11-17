@@ -11,3 +11,10 @@ class ProductOut(Schema):
     price: float
     promotion: bool
     image: Optional[str] = None
+
+    @staticmethod
+    def resolve_image(obj):
+        """Retorna a URL completa da imagem do Cloudinary"""
+        if obj.image:
+            return obj.image.url  # Cloudinary retorna URL completa automaticamente
+        return None
