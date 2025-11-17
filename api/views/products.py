@@ -10,7 +10,6 @@ from ninja.errors import ValidationError as NinjaValidationError
 from accounts.deps import AuthBearer
 from api.models import Product
 from api.schemas.products import ProductOut
-from api.services.products import save_uploaded_image
 from api.utils import staff_required
 
 router = Router(tags=["products"])
@@ -44,8 +43,7 @@ def update_product(
     product.promotion = promotion
 
     if image:
-        image_path = save_uploaded_image(image)
-        product.image = image_path
+        product.image = image  # Django + Cloudinary fazem o upload automaticamente
 
     try:
         product.full_clean()
@@ -74,12 +72,15 @@ def create_product(
     image: UploadedFile | None = File(None),
 ):
     """Create a new product (only staff)"""
-    image_path = save_uploaded_image(image) if image else None
     product = Product(name=name,
                       description=description,
                       price=price,
-                      promotion=promotion,
-                      image=image_path)
+                      promotion=promotion)
+                      # image=image_path)
+
+    if image:
+        product.image = image  # Django + Cloudinary fazem o upload automaticamente
+
     try:
         product.full_clean()
         product.save()
@@ -104,8 +105,7 @@ def delete_product(request, uuid: str):
 def upload_product_image(request, product_uuid: UUID, image: UploadedFile = File(...)):
     """Make upload or replace the product image"""
     product = get_object_or_404(Product, uuid=product_uuid)
-    image_path = save_uploaded_image(image) if image else None
-    product.image = image_path
+    product.image = image  # Django + Cloudinary fazem o upload automaticamente
     try:
         product.full_clean()
         product.save()
