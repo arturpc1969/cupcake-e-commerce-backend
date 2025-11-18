@@ -156,8 +156,23 @@ def test_create_product_success(client, staff_auth_headers):
 
 
 @pytest.mark.django_db
-def test_create_product_with_image(client, staff_auth_headers, sample_image):
+def test_create_product_with_image(staff_auth_headers, sample_image, mocker):
     """Testa criação de produto com imagem"""
+    # Mock do upload do Cloudinary
+    mock_upload = mocker.patch('cloudinary.uploader.upload')
+    mock_upload.return_value = {
+        'public_id': 'test_image_id',
+        'url': 'https://res.cloudinary.com/test/image/upload/test_image.jpg',
+        'secure_url': 'https://res.cloudinary.com/test/image/upload/test_image.jpg'
+    }
+
+    # Mock do CloudinaryResource para evitar erro ao gerar URL
+    mock_cloudinary_resource = mocker.patch('cloudinary.CloudinaryResource.build_url')
+    mock_cloudinary_resource.return_value = 'https://res.cloudinary.com/test/image/upload/test_image.jpg'
+
+    client = APIClient()
+    client.credentials(HTTP_AUTHORIZATION=staff_auth_headers["HTTP_AUTHORIZATION"])
+
     data = {
         "name": "Cupcake com Imagem",
         "description": "Cupcake com foto",
@@ -169,13 +184,17 @@ def test_create_product_with_image(client, staff_auth_headers, sample_image):
     response = client.post(
         "/api/products/",
         data=data,
-        **staff_auth_headers
+        format="multipart"
     )
 
     assert response.status_code == 200
     response_data = response.json()
     assert response_data["name"] == "Cupcake com Imagem"
     assert response_data["image"] is not None
+    assert Product.objects.filter(name="Cupcake com Imagem").exists()
+
+    # Verifica que o upload foi chamado
+    mock_upload.assert_called_once()
 
 
 @pytest.mark.django_db
@@ -233,11 +252,23 @@ def test_create_product_invalid_data(client, staff_auth_headers):
 # --- TESTES PARA UPDATE PRODUCT ---
 
 @pytest.mark.django_db
-def test_update_product_success(product, staff_auth_headers, tmp_path):
+def test_update_product_success(product, staff_auth_headers, tmp_path, mocker):
     """
     Testa atualização de produto com sucesso.
     Usa APIClient do rest_framework.test porque o client do Django tem problemas no teste com PUT e multipart/form-data.
     """
+    # Mock do upload do Cloudinary
+    mock_upload = mocker.patch('cloudinary.uploader.upload')
+    mock_upload.return_value = {
+        'public_id': 'test_image_id',
+        'url': 'https://res.cloudinary.com/test/image/upload/test_image.jpg',
+        'secure_url': 'https://res.cloudinary.com/test/image/upload/test_image.jpg'
+    }
+
+    # Mock do CloudinaryResource para evitar erro ao gerar URL
+    mock_cloudinary_resource = mocker.patch('cloudinary.CloudinaryResource.build_url')
+    mock_cloudinary_resource.return_value = 'https://res.cloudinary.com/test/image/upload/test_image.jpg'
+
     client = APIClient()
     client.credentials(HTTP_AUTHORIZATION=staff_auth_headers["HTTP_AUTHORIZATION"])
 
@@ -265,13 +296,28 @@ def test_update_product_success(product, staff_auth_headers, tmp_path):
     assert product.name == "Cupcake Atualizado"
     assert product.price == 18.00
 
+    # Verifica que o upload foi chamado
+    mock_upload.assert_called_once()
+
 
 @pytest.mark.django_db
-def test_update_product_with_image(product, staff_auth_headers, tmp_path):
+def test_update_product_with_image(product, staff_auth_headers, tmp_path, mocker):
     """
     Testa atualização de produto com nova imagem.
     Usa APIClient do rest_framework.test porque o client do Django tem problemas no teste com PUT e multipart/form-data.
     """
+    # Mock do upload do Cloudinary
+    mock_upload = mocker.patch('cloudinary.uploader.upload')
+    mock_upload.return_value = {
+        'public_id': 'test_image_id',
+        'url': 'https://res.cloudinary.com/test/image/upload/test_image.jpg',
+        'secure_url': 'https://res.cloudinary.com/test/image/upload/test_image.jpg'
+    }
+
+    # Mock do CloudinaryResource para evitar erro ao gerar URL
+    mock_cloudinary_resource = mocker.patch('cloudinary.CloudinaryResource.build_url')
+    mock_cloudinary_resource.return_value = 'https://res.cloudinary.com/test/image/upload/test_image.jpg'
+
     client = APIClient()
     client.credentials(HTTP_AUTHORIZATION=staff_auth_headers["HTTP_AUTHORIZATION"])
 
@@ -298,6 +344,9 @@ def test_update_product_with_image(product, staff_auth_headers, tmp_path):
     product.refresh_from_db()
     assert product.name == "Cupcake com Nova Imagem"
     assert product.image is not None
+
+    # Verifica que o upload foi chamado
+    mock_upload.assert_called_once()
 
 
 @pytest.mark.django_db
@@ -401,8 +450,20 @@ def test_delete_product_not_found(client, staff_auth_headers):
 # --- TESTES PARA UPLOAD IMAGE ---
 
 @pytest.mark.django_db
-def test_upload_product_image_success(client, product, staff_auth_headers, sample_image):
+def test_upload_product_image_success(client, product, staff_auth_headers, sample_image, mocker):
     """Testa upload de imagem para produto existente"""
+    # Mock do upload do Cloudinary
+    mock_upload = mocker.patch('cloudinary.uploader.upload')
+    mock_upload.return_value = {
+        'public_id': 'test_image_id',
+        'url': 'https://res.cloudinary.com/test/image/upload/test_image.jpg',
+        'secure_url': 'https://res.cloudinary.com/test/image/upload/test_image.jpg'
+    }
+
+    # Mock do CloudinaryResource para evitar erro ao gerar URL
+    mock_cloudinary_resource = mocker.patch('cloudinary.CloudinaryResource.build_url')
+    mock_cloudinary_resource.return_value = 'https://res.cloudinary.com/test/image/upload/test_image.jpg'
+
     response = client.post(
         f"/api/products/{product.uuid}/upload-image",
         data={"image": sample_image},
@@ -412,6 +473,9 @@ def test_upload_product_image_success(client, product, staff_auth_headers, sampl
     assert response.status_code == 200
     product.refresh_from_db()
     assert product.image is not None
+
+    # Verifica que o upload foi chamado
+    mock_upload.assert_called_once()
 
 
 @pytest.mark.django_db
