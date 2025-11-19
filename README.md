@@ -162,7 +162,7 @@ CORS_ALLOWED_ORIGINS = [
 
 Arquivos de Mídia                                                                                                                                                                                                                   
 
-Imagens de produtos são armazenadas em media/products/. Configure o servidor web para servir esses arquivos em produção.                                                                                                            
+Imagens de produtos são armazenadas em uma conta no Cloudinary, configurado através de variáveis de ambiente.                                                                                                            
 
 
 📁 Estrutura do Projeto                                                                                                                                                                                                             
@@ -189,8 +189,7 @@ cupcake-e-commerce-backend/
 ├── config/                  # Configurações Django                                                                                                                                                                                 
 │   ├── settings.py          # Configurações principais                                                                                                                                                                             
 │   └── urls.py              # URLs principais                                                                                                                                                                                      
-├── media/                   # Arquivos de mídia                                                                                                                                                                                    
-└── manage.py               # CLI do Django                                                                                                                                                                                         
+└── manage.py                # CLI do Django                                                                                                                                                                                         
                                                                                                                                                                                                                                     
 
 
@@ -346,7 +345,7 @@ Order (Pedido)
 - user: FK(User)                                                                                                                                                                                                                    
 - delivery_address: FK(DeliveryAddress)                                                                                                                                                                                             
 - payment_method: choice                                                                                                                                                                                                            
-- status: choice (PENDING, CONFIRMED, PREPARING, etc.)                                                                                                                                                                              
+- status: choice (PENDING, CONFIRMED, PREPARATION, etc.)                                                                                                                                                                              
 - total: decimal                                                                                                                                                                                                                    
 - is_active: boolean                                                                                                                                                                                                                
 - created_at: datetime                                                                                                                                                                                                              
@@ -361,7 +360,6 @@ OrderItem (Item do Pedido)
 - product: FK(Product)                                                                                                                                                                                                              
 - quantity: int                                                                                                                                                                                                                     
 - unit_price: decimal                                                                                                                                                                                                               
-- total_price: decimal                                                                                                                                                                                                              
                                                                                                                                                                                                                                     
 
 DeliveryAddress (Endereço de Entrega)                                                                                                                                                                                               
@@ -432,7 +430,11 @@ ALLOWED_HOSTS=localhost,127.0.0.1
 # JWT                                                                                                                                                                                                                               
 ACCESS_TOKEN_LIFETIME_MINUTES=60                                                                                                                                                                                                    
 REFRESH_TOKEN_LIFETIME_DAYS=7                                                                                                                                                                                                       
-                                                                                                                                                                                                                                    
+
+# Coudinary
+CLOUDINARY_API_KEY=sua-api-key-cloudinary
+CLOUDINARY_API_SECRET=seu-api-secret-cloudinary
+CLOUDINARY_CLOUD_NAME=seu-cloud-name-claudinary                                                                                                                                                                                                                                    
 
 
 📝 Status dos Pedidos                                                                                                                                                                                                               
@@ -448,7 +450,7 @@ REFRESH_TOKEN_LIFETIME_DAYS=7
   WAITING_PAYMENT   Aguardando Pagamento                     
   DELIVERED         Pedido entregue                        
   FINISHED          Pedido Finalizado
-  CANCELED         Pedido cancelado                       
+  CANCELED          Pedido cancelado                       
                                                       
 
 
@@ -459,24 +461,14 @@ REFRESH_TOKEN_LIFETIME_DAYS=7
  • BANK_SLIP - Boleto Bancário                                                                                                                                                                                                      
  • PIX - Pix                                                                                                                                                                                                                        
 
-
-📄 Licença                                                                                                                                                                                                                          
-
-Este projeto é privado e de uso interno.                                                                                                                                                                                            
-
-
-👥 Contribuindo                                                                                                                                                                                                                     
-
- 1 Faça um fork do projeto                                                                                                                                                                                                          
- 2 Crie uma branch para sua feature (git checkout -b feature/MinhaFeature)                                                                                                                                                          
- 3 Commit suas mudanças (git commit -m 'Adiciona MinhaFeature')                                                                                                                                                                     
- 4 Push para a branch (git push origin feature/MinhaFeature)                                                                                                                                                                        
- 5 Abra um Pull Request                                                                                                                                                                                                             
-
-
-📧 Contato                                                                                                                                                                                                                          
-
-Para dúvidas ou sugestões, entre em contato com a equipe de desenvolvimento.                                                                                                                                                        
-
 ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 ⭐ Desenvolvido com Django e Django Ninja
+
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+
+👥 Autor
+
+ • Nome: Artur de Paula Coutinho
+ • RGM: 29655960
+ • Curso: Engenharia de Software
+ • Instituição: UNICID
