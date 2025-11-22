@@ -1,6 +1,11 @@
 # 🧁 Cupcake E-Commerce Backend                                                                                                                                                                                                     
                                                                                                                                                                                                                                     
 Backend para um sistema de e-commerce de cupcakes desenvolvido com Django e Django Ninja.                                                                                                                                           
+
+[![Python](https://img.shields.io/badge/Python-3.11-yellow?logo=python&color=rgb(255,212,73))](https://www.python.org/)
+[![Django](https://img.shields.io/badge/Django-5.2-blue?logo=django&color=rgb(12%2C75%2C51))](https://www.djangoproject.com/)
+[![Ninja](https://img.shields.io/badge/Ninja-1.4-green?logo=djangoninja&color=rgb(76,174,79))](https://django-ninja.dev/)
+[![Postgresql](https://img.shields.io/badge/Postgresql-17-blue?logo=postgresql&color=rgb(98,148,189))](https://www.postgresql.org/)
                                                                                                                                                                                                                                     
 ## 📋 Índice                                                                                                                                                                                                                        
                                                                                                                                                                                                                                     
